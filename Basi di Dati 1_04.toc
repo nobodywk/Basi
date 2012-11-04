@@ -1,0 +1,6 @@
+\select@language {italian}
+\contentsline {chapter}{\numberline {1}Parte I}{2}
+\contentsline {section}{\numberline {1.1}Abstract}{2}
+\contentsline {section}{\numberline {1.2}Analisi dei requisiti}{3}
+\contentsline {section}{\numberline {1.3}Le classi}{4}
+\contentsline {section}{\numberline {1.4}Associazioni}{6}

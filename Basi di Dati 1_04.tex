@@ -1,0 +1,315 @@
+\documentclass[a4paper,12pt]{report}
+
+\usepackage[top=2.5cm,left=2.5cm,bottom=3cm,right=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ae}
+%\usepackage{type1ec}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{setspace}
+\usepackage[Lenny]{fncychap}
+\usepackage[bottom]{footmisc}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{graphicx}
+
+\title{Progetto di Basi di Dati}
+\author{Federico Gobbo}
+\date{Maggio 2012}
+
+\setstretch{1.5}
+\begin{document}
+
+\maketitle
+\tableofcontents
+%-----------------------------------------------------------------------------------1
+\chapter{Parte I}
+%--------------------1.1
+\section{Abstract}
+Il progetto si propone di riprodurre la gestione di un ambiente virtuale tridimensionale, al fine di immagazzinare le informazioni relative agli oggetti (modelli, luci, telecamere) in esso presenti e quindi effettuare operazioni di creazione e trasformazione sugli stessi. In base al numero e alla complessità degli oggetti presenti sarà possibile calcolare una stima del tempo di rendering, espressa in unità di tempo. Essendo tale ambiente semplificato, si basa su informazioni potenzialmente imprecise e inadeguate rispetto alle corrispettive implementazioni negli attuali software di grafica 3D, ciò nondimeno ne rispecchia le caratteristiche essenziali. Ipotizzando una situazione lavorativa per la quale più utenti abbiano accesso al database sarà implementato un sistema di autenticazione e di permessi relativo alla possibilità di visualizzare o modificare interi progetti o parte di essi.
+\newpage
+\section{Analisi dei requisiti}
+{\it Un nuovo progetto comporta la creazione di un Ambiente 3D identificato univocamente, a cui è associato il codice dell'Utente creatore e la data di creazione.}
+%\begin{itemize}
+%	\item[-] {\bf Ambiente 3D}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice progetto
+%			\item[-] data creazione
+%			\item[-] codice utente
+%		\end{itemize}\end{small}
+%\end{itemize}
+{\it Ogni Ambiente può contenere più Modelli identificati da un codice, che possono a loro volta essere utilizzati in altri progetti. D'ora in avanti i termini ``progetto'' e ``ambiente'' saranno intesi come sinonimi, rispetto ai fini di questa base di dati. Un Ambiente è concettualmente caratterizzato da tre assi che si intersecano nell'origine, rispetto alla quale è indicata la posizione degli elementi della scena.}
+%\begin{itemize}
+%	\item[-] {\bf Modello}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice modello
+%			\item[-] posizione (riferita al pivot rispetto all'origine degli assi)
+%			\item[-] numero di vertici
+%			\item[-] numero di poligoni
+%			%\item[-] modello padre
+%		\end{itemize}\end{small}
+%	\item[-] {\bf Poligono}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] numero di poligono (identificativo)
+%			\item[-] modello padre
+%		\end{itemize}\end{small}
+%	\item[-] {\bf Vertice}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] numero di vertice (identificativo)
+%			\item[-] posizione
+%			\item[-] colore
+%			\item[-] modello padre
+%		\end{itemize}\end{small}
+%\end{itemize}
+{\it Un Modello è un oggetto composto da uno o più Poligoni (facce), a loro volta costituiti da Vertici. Per semplicità i Poligoni vengono considerati tutti triangolari, dunque tre Vertici identificano un Poligono. Si assume che non possano esistere Vertici che non appartengono a nessun Poligono. La posizione di un Modello è riferita al pivot, calcolato come media delle posizioni dei Vertici (salvo modifica manuale).}
+%\newpage
+%\begin{itemize}
+%	\item[-] {\bf Telecamera}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice telecamera
+%			\item[-] posizione
+%			\item[-] posizione target
+%		\end{itemize}\end{small}
+%\end{itemize}
+{\it La Telecamera indica il punto di vista dell'osservatore, che, in base al campo di visione, determina la porzione dell'Ambiente che sarà visibile nel Rendering.}
+%\begin{itemize}
+%	\item[-] {\bf Luce}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice luce
+%			\item[-] posizione
+%			\item[-] tipo di luce (direzionale, omnidirezionale)
+%			\item[-] target (opzionale, solo se direzionale)
+%		\end{itemize}\end{small}
+%\end{itemize}
+{\it Le Luci possono essere Omnidirezionali oppure Direzionali, nel qual caso saranno orientate verso un determinato punto nello spazio (target). Si pone come vincolo che per effettuare un Rendering sia neccessaria la presenza di almeno una Luce nell'Ambiente.}
+%\begin{itemize}
+%	\item[-] {\bf Utente}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice utente
+%			\item[-] cognome
+%			\item[-] data di nascita
+%			\item[-] città
+%			\item[-] tipo di utente (creatore, superiore, altri)
+%		\end{itemize}\end{small}
+%\end{itemize}
+{\it Ogni utente ha facoltà di creare un proprio Progetto sul quale ha pieno potere di modifica. Utenti appartenenti allo stesso Gruppo hanno pari poteri sui Progetti creati, mentre hanno il solo permesso di visualizzazione su Progetti di altri Gruppi. Il Gruppo Amministratore ha pieno accesso ai Progetti di ogni Gruppo. Può essere concesso in via temporanea il permesso di modifica ad un Utente estraneo ad un dato Gruppo, che sarà revocato al termine della scadenza.}
+%\begin{itemize}
+%	\item[-] {\bf Rendering}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice rendering
+%			\item[-] codice camera
+%		\end{itemize}\end{small}
+%\end{itemize}
+%{\it Ogni Rendering è associato ad una Telecamera. Più Rendering possono essere raccolti in un Book Fotografico il quale può essere inserito in coda di stampa.}
+%\begin{itemize}
+%	\item[-] {\bf Book Fotografico}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice book
+%			\item[-] numero pagine
+%			\item[-] data creazione
+%		\end{itemize}\end{small}
+%\end{itemize}
+{\it Un Book contiene le informazioni relative agli Utenti che hanno lavorato ai Rendering contenuti, che possono essere relativi a più Progetti, anche di Gruppi differenti. Ad esempio il Book riguardante un contest conterrà i Rendering dei progetti degli Utenti partecipanti.}
+%\begin{itemize}
+%	\item[-] {\bf Stampa}
+%		\begin{small}\begin{itemize}
+%			\setstretch{1.0}
+%			\item[-] codice stampa
+%			\item[-] codice book
+%			\item[-] numero pagine
+%			\item[-] numero copie
+%			\item[-] data
+%			\item[-] costo
+%			%\item[-] carta
+%		\end{itemize}\end{small}
+%\end{itemize}
+{\it Una volta creato un Book esso può essere inserito in coda di stampa. Terminata la stampa dei Book precedenti verrà prodotta la Stampa attuale, considerando il tempo e il costo della stessa.}
+{\it Gli Utenti possono creare e modificare gli elementi della scena, applicando funzioni di traslazione, rotazione, ridimensionamento, assolute o relative. I Modelli Base possono essere creati utilizzando funzioni predefinite, mentre gli altri modelli possono essere creati a partire dalla posizione dei Vertici e dalla definizione dei Poligoni.}\\
+Operazioni
+\begin{itemize}
+	\setstretch{1.0}
+	\item[.] creazione di un modello base
+	\item[.] creazione di un modello a partire dai vertici
+	\item[.] traslazione, rotazione e ridimensionamento di un modello
+	\item[.] cambio di posizione del pivot
+	\item[.] copia di modelli
+	\item[.] creazione di una telecamera
+	\item[.] stima del tempo di rendering (complessità della scena)
+	\item[.]
+\end{itemize}
+Query
+\begin{itemize}
+	\item[§] totale numero di vertici
+	\item[§] calcolo del tempo di rendering
+	\item[§] totale numero di poligoni
+	\item[§] numero di vertici e poligoni nel campo visivo
+\end{itemize}
+Trigger
+\begin{itemize}
+	\item[*] calcolo del pivot 
+	\item[*] 
+\end{itemize}
+
+Appunti: 
+telecamere standard (top, front, left)\\
+prospettiva??\\
+\section{Le classi}
+Descrizione delle classi e degli attributi.
+\begin{itemize}
+	\item[-] {\bf Ambiente 3D}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] CodPro: string  <\-<PK>\->
+			\item[-] Data: date
+			\item[-] CodUtente: string <\-<FK>\->
+		\end{itemize}\end{small}
+\end{itemize}
+\begin{itemize}
+	\item[-] {\bf Modello}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] CodMod: string <\-<PK>\->
+			\item[-] Posizione: double (PosX, PosY, PosZ)
+			\item[-] NumVert: int
+			\item[-] NumPoly: int
+			%\item[-] modello padre
+		\end{itemize}\end{small}
+	\item[-] {\bf Poligono}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] PolyNum: int <\-<PK>\->
+			\item[-] CodMod: string <\-<FK>\->
+		\end{itemize}\end{small}
+	\item[-] {\bf Vertice}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] VertNum: int <\-<PK>\->
+			\item[-] Posizione: double (PosX, PosY, PosZ)
+			\item[-] Colore: int
+			\item[-] CodMod: int <\-<FK>\->
+		\end{itemize}\end{small}
+\end{itemize}
+\begin{itemize}
+	\item[-] {\bf Telecamera}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] CodCam: string <\-<PK>\->
+			\item[-] Posizione: double (PosX, PosY, PosZ)
+			\item[-] PosTarget: double (PosX, PosY, PosZ)
+		\end{itemize}\end{small}
+\end{itemize}
+\begin{itemize}
+	\item[-] {\bf Luce}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] CodLuce: string <\-<PK>\->
+			\item[-] Posizione: double (PosX, PosY, PosZ)
+			\item[-] Tipo: string (Omnidirezionale, Direzionale)
+			\item[-] PosTarget: double (PosX, PosY, PosZ) 
+		\end{itemize}\end{small}
+\end{itemize}
+\begin{itemize}
+	\item[-] {\bf Utente}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] CodUtente: string <\-<PK>\->
+			\item[-] Cognome: string
+			\item[-] DataNascita: date
+			\item[-] Città: string
+			\item[-] Gruppo: string (Creatore, Amministratore, Altro) <\-<FK>\->
+		\end{itemize}\end{small}
+\end{itemize}
+\begin{itemize}
+	\item[-] {\bf Stampa}
+		\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] CodStampa: string <\-<PK>\->
+			\item[-] CodBook: string <\-<FK>\->
+			\item[-] NumPag: int
+			\item[-] NumCopie: int
+			\item[-] Data: date
+			\item[-] Costo: int
+			%\item[-] carta
+		\end{itemize}\end{small}
+\end{itemize}
+Vincoli: 
+\begin{itemize}
+	\setstretch{1.0}
+	\item[-] Ogni gruppo può modificare tutti e soli i progetti di cui è creatore.
+	\item[-] Un Ambiente può essere modificato da un solo Gruppo (Utente?) alla volta
+\end{itemize}
+\section{Associazioni}
+{\bf Vertice-Poligono: Appartiene}
+\begin{itemize}
+	\setstretch{1.0}
+	\item[-] Ogni Vertice è parte di uno o più Poligoni, ogni Poligono ha almeno un Vertice (nello specifico ha sempre tre Vertici)
+	\item[-] Moltplicità M:N
+	\item[-] Totalità:
+	\begin{small}\begin{itemize}
+			\setstretch{1.0}
+			\item[-] totale da Vertice a Poligono;
+			\item[-] totale da Poligono a Vertice;
+		\end{itemize}\end{small}
+\end{itemize}
+{\bf Poligono-Modello: Appartiene}
+\begin{itemize}
+	\setstretch{1.0}
+	\item[-] Ogni Poligono è parte di un Modello, ogni Modello ha almeno un Poligono.
+	\item[-] Moltplicità M:1
+	\item[-] Totalità:
+	\begin{small}\begin{itemize}
+		\setstretch{1.0}
+		\item[-] totale da Poligono a Modello;
+		\item[-] totale da Modello a Poligono;
+	\end{itemize}\end{small}
+\end{itemize}
+{\bf Camera-Rendering: Riguarda}
+\begin{itemize}
+	\setstretch{1.0}
+	\item[-] Una Camera riguarda un Rendering
+	\item[-] Moltplicità 1:M
+	\item[-] Totalità:
+	\begin{small}\begin{itemize}
+		\setstretch{1.0}
+		\item[-] parziale da Camera a Rendering;
+		\item[-] totale da Rendering a Camera;
+	\end{itemize}\end{small}
+\end{itemize}
+{\bf Rendering-Book: \'E incluso}
+\begin{itemize}
+	\setstretch{1.0}
+	\item[-] Un Rendering può essere incluso in uno o più Book, ogni Book include uno o più Rendering
+	\item[-] Moltplicità M:N
+	\item[-] Totalità:
+	\begin{small}\begin{itemize}
+		\setstretch{1.0}
+		\item[-] parziale da Rendering a Book;
+		\item[-] totale da Book a Rendering;
+	\end{itemize}\end{small}
+\end{itemize}
+{\bf Ambiente-Oggetto: Contiene}
+\begin{itemize}
+	\setstretch{1.0}
+	\item[-] Un Ambiente può contenere più Oggetti, un Oggetto può essere contenuto in uno o più Ambienti
+	\item[-] Moltplicità 
+	\item[-] Totalità:
+	\begin{small}\begin{itemize}
+		\setstretch{1.0}
+		\item[-] parziale da Ambiente a Oggetto;
+		\item[-] totale da Oggetto a Ambiente;
+	\end{itemize}\end{small}
+\end{itemize}
+\end{document}
