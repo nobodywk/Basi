@@ -21,6 +21,9 @@
 \author{Federico Gobbo}
 \date{Maggio 2012}
 
+\def\lcap{\hskip 0pt \raise .28ex \hbox{\tiny $\ll$}}
+\def\rcap{\hskip 0pt \raise .28ex \hbox{\tiny $\gg$}}
+
 \setstretch{1.5}
 \begin{document}
 
@@ -166,78 +169,81 @@ Trigger
 Appunti: 
 telecamere standard (top, front, left)\\
 prospettiva??\\
+\newpage
 \section{Le classi}
 Descrizione delle classi e degli attributi.
 \begin{itemize}
-	\item[-] {\bf Ambiente 3D}
+	\item[-] {\bf Ambienti 3D}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] CodPro: string  <\-<PK>\->
+			\item[-] CodPro: string \lcap PK\rcap
 			\item[-] Data: date
-			\item[-] CodUtente: string <\-<FK>\->
+			\item[-] CodUtente: string \lcap FK\rcap
 		\end{itemize}\end{small}
 \end{itemize}
 \begin{itemize}
-	\item[-] {\bf Modello}
+	\item[-] {\bf Modelli}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] CodMod: string <\-<PK>\->
+			\item[-] CodMod: string \lcap PK\rcap 
 			\item[-] Posizione: double (PosX, PosY, PosZ)
 			\item[-] NumVert: int
 			\item[-] NumPoly: int
 			%\item[-] modello padre
 		\end{itemize}\end{small}
-	\item[-] {\bf Poligono}
+	\item[-] {\bf Poligoni}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] PolyNum: int <\-<PK>\->
-			\item[-] CodMod: string <\-<FK>\->
+			\item[-] PolyNum: int \lcap PK\rcap 
+			\item[-] CodMod: string \lcap FK\rcap 
 		\end{itemize}\end{small}
-	\item[-] {\bf Vertice}
+	\item[-] {\bf Vertici}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] VertNum: int <\-<PK>\->
+			\item[-] VertNum: int \lcap PK\rcap 
 			\item[-] Posizione: double (PosX, PosY, PosZ)
 			\item[-] Colore: int
-			\item[-] CodMod: int <\-<FK>\->
+			\item[-] CodMod: int \lcap FK\rcap 
 		\end{itemize}\end{small}
 \end{itemize}
 \begin{itemize}
-	\item[-] {\bf Telecamera}
+	\item[-] {\bf Cameras}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] CodCam: string <\-<PK>\->
+			\item[-] CodCam: string \lcap PK\rcap 
 			\item[-] Posizione: double (PosX, PosY, PosZ)
 			\item[-] PosTarget: double (PosX, PosY, PosZ)
 		\end{itemize}\end{small}
 \end{itemize}
 \begin{itemize}
-	\item[-] {\bf Luce}
+	\item[-] {\bf Luci}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] CodLuce: string <\-<PK>\->
+			\item[-] CodLuce: string \lcap PK\rcap
 			\item[-] Posizione: double (PosX, PosY, PosZ)
 			\item[-] Tipo: string (Omnidirezionale, Direzionale)
 			\item[-] PosTarget: double (PosX, PosY, PosZ) 
 		\end{itemize}\end{small}
 \end{itemize}
+\samepage{
 \begin{itemize}
-	\item[-] {\bf Utente}
+	\item[-] {\bf Utenti}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] CodUtente: string <\-<PK>\->
+			\item[-] CodUtente: string \lcap PK\rcap 
 			\item[-] Cognome: string
 			\item[-] DataNascita: date
 			\item[-] Città: string
-			\item[-] Gruppo: string (Creatore, Amministratore, Altro) <\-<FK>\->
+			\item[-] Gruppo: string (Creatore, Amministratore, Altro) \lcap FK\rcap 
 		\end{itemize}\end{small}
 \end{itemize}
+}
 \begin{itemize}
-	\item[-] {\bf Stampa}
+	\item[-] {\bf Stampe}
 		\begin{small}\begin{itemize}
 			\setstretch{1.0}
-			\item[-] CodStampa: string <\-<PK>\->
-			\item[-] CodBook: string <\-<FK>\->
+			\item[-] CodStampa: string \lcap PK\rcap 
+			\item[-] CodBook: string \lcap FK\rcap 
 			\item[-] NumPag: int
 			\item[-] NumCopie: int
 			\item[-] Data: date
